@@ -46,11 +46,6 @@ class MetaTaskInterface(ABC):
         pass
 
     @abstractmethod
-    def _requested_action(self, github_body) -> bool:
-        """Logic to execute when a user requests an action on the task"""
-        raise NotImplementedError("Please implement _requested_action.")
-
-    @abstractmethod
-    def _execute(self, github_body) -> bool:
+    def execute(self, github_body) -> bool:
         """Logic to execute for task"""
         raise NotImplementedError("Please implement _execute method.")
