@@ -42,10 +42,16 @@ class MetaTaskInterface(ABC):
     @property
     @abstractmethod
     def actions(self) -> dict:
-        """ If task allows actions to be taken, return here."""
+        """If task allows actions to be taken, return here."""
         pass
 
     @abstractmethod
     def execute(self, github_body) -> bool:
         """Logic to execute for task"""
         raise NotImplementedError("Please implement _execute method.")
+
+    @property
+    @abstractmethod
+    def subscription_tier(self) -> str:
+        """Subscription tier app is available on"""
+        pass
