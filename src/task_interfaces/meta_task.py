@@ -52,6 +52,6 @@ class MetaTaskInterface(ABC):
 
     @property
     @abstractmethod
-    def subscription_tier(self) -> str:
-        """Subscription tier app is available on"""
+    def subscription_level(self) -> str:
+        """Subscription level app is available on"""
         pass
