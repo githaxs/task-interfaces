@@ -1,0 +1,3 @@
+git+https://github_token:x-oauth-basic@github.com/githaxs/base-task.git@v0.0.8
+git+https://github_token:x-oauth-basic@github.com/githaxs/code-check.git@v0.0.3
+PyYAML==5.4.1
