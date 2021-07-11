@@ -2,3 +2,4 @@ __pycache__
 .coverage
 src/base_task.egg-info
 htmlcov
+*.pyc
