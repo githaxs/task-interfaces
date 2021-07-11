@@ -1,1 +1,3 @@
-from .task import TaskInterface, SubscriptionLevels, TaskTypes
+from .task import SubscriptionLevels
+from .task import TaskInterface
+from .task import TaskTypes

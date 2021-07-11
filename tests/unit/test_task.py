@@ -1,6 +1,8 @@
 import pytest
+from src.task_interfaces.task import SubscriptionLevels
+from src.task_interfaces.task import TaskInterface
+from src.task_interfaces.task import TaskTypes
 
-from src.task_interfaces.task import TaskInterface, SubscriptionLevels, TaskTypes
 
 class Foo(TaskInterface):
     name = "foo"
@@ -25,6 +27,7 @@ def test_throws_with_invalid_subscription_level():
         foo = Foo()
         print(e_info)
 
+
 def test_throws_with_invalid_type():
     with pytest.raises(Exception) as e_info:
         Foo.type = "bar"
@@ -34,6 +37,7 @@ def test_throws_with_invalid_type():
     Foo.type = TaskTypes.CODE_ANALYSIS
     Foo.subscription_level = SubscriptionLevels.FREE
     foo = Foo()
+
 
 def test_source_handler():
     with pytest.raises(Exception) as e_info:
@@ -49,19 +53,17 @@ def test_source_handler():
         foo = Foo()
         print(e_info)
 
-
     Foo.source_script = "bar"
     Foo.handler = "bar"
     foo = Foo()
- 
+
+
 def test_bad_slug():
     Foo.slug = "0000"
 
     with pytest.raises(Exception) as e_info:
         foo = Foo()
         print(e_info)
-    
+
     Foo.slug = "bar"
     foo = Foo()
-
-

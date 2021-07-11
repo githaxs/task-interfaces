@@ -1,7 +1,8 @@
+import re
 from abc import ABC
 from abc import abstractmethod
 from enum import Enum
-import re
+
 
 class SubscriptionLevels(Enum):
     FREE = 0
@@ -11,31 +12,36 @@ class SubscriptionLevels(Enum):
 
 
 class TaskTypes(Enum):
-    CODE_FORMAT = 'code_format'
-    CODE_ANALYSIS = 'code_analysis'
-    META_ANALYSIS = 'meta_analysis'
+    CODE_FORMAT = "code_format"
+    CODE_ANALYSIS = "code_analysis"
+    META_ANALYSIS = "meta_analysis"
+
 
 class TaskInterface(ABC):
-    command : str = None
-    source_script : str = None
-    handler : str = None
+    command: str = None
+    source_script: str = None
+    handler: str = None
 
     def __init__(self):
-        if not self.subscription_level in SubscriptionLevels.__members__.values():
+        if self.subscription_level not in SubscriptionLevels.__members__.values():
             raise Exception("Subscription Level is not a valid value.")
 
-        if not self.type in TaskTypes.__members__.values():
+        if self.type not in TaskTypes.__members__.values():
             raise Exception("Task Type is not a valid value.")
 
         if not self.command and not self.source_script and not self.handler:
-            raise Exception("Either command or source script and handle must be defined.")
+            raise Exception(
+                "Either command or source script and handle must be defined."
+            )
 
-        if (self.source_script and not self.handler) or (not self.source_script and self.handler):
+        if (self.source_script and not self.handler) or (
+            not self.source_script and self.handler
+        ):
             raise Exception("Source script and handler must be used together.")
-    
-        if not re.match(r'[a-z-]+', self.slug):
+
+        if not re.match(r"[a-z-]+", self.slug):
             raise Exception("Task Slug can only contain letters and -.")
-        
+
     @property
     @abstractmethod
     def name(self):
