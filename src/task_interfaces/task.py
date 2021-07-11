@@ -4,7 +4,7 @@ from abc import abstractmethod
 from enum import Enum
 
 
-class SubscriptionLevels(Enum):
+class SubscriptionLevels:
     FREE = 0
     STARTUP = 1
     GROWTH = 2
@@ -16,26 +16,31 @@ class TaskTypes(Enum):
     CODE_ANALYSIS = "code_analysis"
     META_ANALYSIS = "meta_analysis"
 
+    @classmethod
+    def list(cls):
+        return list(map(lambda c: c.value, cls))
+
 
 class TaskInterface(ABC):
-    command: str = None
-    source_script: str = None
-    handler: str = None
+    command: str = ""
+    source_script_path: str = ""
+    handler: str = ""
+    file_filters: str = ""
 
     def __init__(self):
-        if self.subscription_level not in SubscriptionLevels.__members__.values():
+        if self.subscription_level not in [0, 1, 2, 3]:
             raise Exception("Subscription Level is not a valid value.")
 
         if self.type not in TaskTypes.__members__.values():
             raise Exception("Task Type is not a valid value.")
 
-        if not self.command and not self.source_script and not self.handler:
+        if not self.command and not self.source_script_path and not self.handler:
             raise Exception(
                 "Either command or source script and handle must be defined."
             )
 
-        if (self.source_script and not self.handler) or (
-            not self.source_script and self.handler
+        if (self.source_script_path and not self.handler) or (
+            not self.source_script_path and self.handler
         ):
             raise Exception("Source script and handler must be used together.")
 
