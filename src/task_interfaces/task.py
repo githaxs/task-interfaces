@@ -16,6 +16,10 @@ class TaskTypes(Enum):
     CODE_ANALYSIS = "code_analysis"
     META_ANALYSIS = "meta_analysis"
 
+    @classmethod
+    def list(cls):
+        return list(map(lambda c: c.value, cls))
+
 
 class TaskInterface(ABC):
     command: str = ""
