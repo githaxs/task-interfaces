@@ -14,7 +14,7 @@ class SubscriptionLevels:
 class TaskTypes(Enum):
     CODE_FORMAT = "code_format"
     CODE_ANALYSIS = "code_analysis"
-    META_ANALYSIS = "meta_analysis"
+    WORKFLOW = "workflow"
 
     @classmethod
     def list(cls):
@@ -27,6 +27,8 @@ class TaskInterface(ABC):
     handler: str = ""
     file_filters: str = ""
 
+    # If using custom script, validate the file exists
+    # IF meta analysis, I don't need any script stuff
     def __init__(self):
         if self.subscription_level not in [0, 1, 2, 3]:
             raise Exception("Subscription Level is not a valid value.")
@@ -34,18 +36,19 @@ class TaskInterface(ABC):
         if self.type not in TaskTypes.__members__.values():
             raise Exception("Task Type is not a valid value.")
 
-        if not self.command and not self.source_script_path and not self.handler:
-            raise Exception(
-                "Either command or source script and handle must be defined."
-            )
+        if self.type != TaskTypes.WORKFLOW:
+            if not self.command and not self.source_script_path and not self.handler:
+                raise Exception(
+                    "Either command or source script and handle must be defined."
+                )
 
-        if (self.source_script_path and not self.handler) or (
-            not self.source_script_path and self.handler
-        ):
-            raise Exception("Source script and handler must be used together.")
+            if (self.source_script_path and not self.handler) or (
+                not self.source_script_path and self.handler
+            ):
+                raise Exception("Source script and handler must be used together.")
 
-        if not re.match(r"[a-z-]+", self.slug):
-            raise Exception("Task Slug can only contain letters and -.")
+            if not re.match(r"[a-z-]+", self.slug):
+                raise Exception("Task Slug can only contain letters and -.")
 
     @property
     @abstractmethod
@@ -102,4 +105,7 @@ class TaskInterface(ABC):
     @property
     @abstractmethod
     def type(self) -> str:
+        pass
+
+    def pre_execute_hook(self, **kwargs):
         pass
