@@ -3,14 +3,6 @@ from abc import ABC
 from abc import abstractmethod
 from enum import Enum
 
-
-class SubscriptionLevels:
-    FREE = 0
-    STARTUP = 1
-    GROWTH = 2
-    ENTERPRISE = 3
-
-
 class TaskTypes(Enum):
     CODE_FORMAT = "code_format"
     CODE_ANALYSIS = "code_analysis"
@@ -22,6 +14,37 @@ class TaskTypes(Enum):
     def list(cls):
         return list(map(lambda c: c.value, cls))
 
+
+class DeployTaskInterface(ABC):
+    type = TaskTypes.DEPLOY
+
+    def __init__(self):
+        if self.subscription_level not in [0, 1, 2, 3]:
+            raise Exception("Subscription Level is not a valid value.")
+
+    @property
+    @abstractmethod
+    def name(self):
+        """Returns the name of the task."""
+        pass
+
+    def slug(self):
+        """Retuns the slug of the task."""
+        return self.name.lower().replace(' ', '-')
+
+    @property
+    @abstractmethod
+    def subscription_level(self) -> int:
+        pass
+
+    def pre_execute_hook(self, **kwargs):
+        pass
+
+class SubscriptionLevels:
+    FREE = 0
+    STARTUP = 1
+    GROWTH = 2
+    ENTERPRISE = 3
 
 class TaskInterface(ABC):
     command: str = ""
@@ -105,31 +128,6 @@ class TaskInterface(ABC):
     @property
     @abstractmethod
     def type(self) -> str:
-        pass
-
-    def pre_execute_hook(self, **kwargs):
-        pass
-
-class DeployTaskInterface(ABC):
-    type = TaskTypes.DEPLOY
-
-    def __init__(self):
-        if self.subscription_level not in [0, 1, 2, 3]:
-            raise Exception("Subscription Level is not a valid value.")
-
-    @property
-    @abstractmethod
-    def name(self):
-        """Returns the name of the task."""
-        pass
-
-    def slug(self):
-        """Retuns the slug of the task."""
-        return self.name.lower().replace(' ', '-')
-
-    @property
-    @abstractmethod
-    def subscription_level(self) -> int:
         pass
 
     def pre_execute_hook(self, **kwargs):
