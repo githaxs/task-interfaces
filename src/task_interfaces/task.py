@@ -131,3 +131,6 @@ class DeployTaskInterface(ABC):
     @abstractmethod
     def subscription_level(self) -> int:
         pass
+
+    def pre_execute_hook(self, **kwargs):
+        pass
