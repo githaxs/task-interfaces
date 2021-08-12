@@ -15,6 +15,8 @@ class TaskTypes(Enum):
     CODE_FORMAT = "code_format"
     CODE_ANALYSIS = "code_analysis"
     WORKFLOW = "workflow"
+    DEPLOY   = "deploy"
+    UNIT_TEST   = "unit_test"
 
     @classmethod
     def list(cls):
@@ -56,11 +58,9 @@ class TaskInterface(ABC):
         """Returns the name of the task."""
         pass
 
-    @property
-    @abstractmethod
     def slug(self):
         """Retuns the slug of the task."""
-        pass
+        return self.name.lower().replace(' ', '-')
 
     @property
     @abstractmethod
@@ -108,4 +108,26 @@ class TaskInterface(ABC):
         pass
 
     def pre_execute_hook(self, **kwargs):
+        pass
+
+class DeployTaskInterface(ABC):
+    type = TaskTypes.DEPLOY
+
+    def __init__(self):
+        if self.subscription_level not in [0, 1, 2, 3]:
+            raise Exception("Subscription Level is not a valid value.")
+
+    @property
+    @abstractmethod
+    def name(self):
+        """Returns the name of the task."""
+        pass
+
+    def slug(self):
+        """Retuns the slug of the task."""
+        return self.name.lower().replace(' ', '-')
+
+    @property
+    @abstractmethod
+    def subscription_level(self) -> int:
         pass
