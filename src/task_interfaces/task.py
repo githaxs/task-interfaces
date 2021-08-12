@@ -28,6 +28,7 @@ class DeployTaskInterface(ABC):
         """Returns the name of the task."""
         pass
 
+    @property
     def slug(self):
         """Retuns the slug of the task."""
         return self.name.lower().replace(' ', '-')
@@ -81,6 +82,7 @@ class TaskInterface(ABC):
         """Returns the name of the task."""
         pass
 
+    @property
     def slug(self):
         """Retuns the slug of the task."""
         return self.name.lower().replace(' ', '-')
