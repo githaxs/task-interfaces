@@ -17,6 +17,7 @@ class TaskTypes(Enum):
 
 class DeployTaskInterface(ABC):
     type = TaskTypes.DEPLOY
+    requires_dependencies = False
 
     def __init__(self):
         if self.subscription_level not in [0, 1, 2, 3]:
@@ -52,6 +53,7 @@ class TaskInterface(ABC):
     source_script_path: str = ""
     handler: str = ""
     file_filters: str = ""
+    requires_dependencies = False
 
     # If using custom script, validate the file exists
     # IF meta analysis, I don't need any script stuff
