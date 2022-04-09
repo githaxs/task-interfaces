@@ -8,6 +8,7 @@ class TaskTypes(Enum):
     CODE_ANALYSIS = "code_analysis"
     WORKFLOW = "workflow"
     DEPLOY_WORKFLOW = "deploy_workflow"
+    DEPLOY_WORKER = "deploy_worker"
     DEPLOY   = "deploy"
     UNIT_TEST   = "unit_test"
 
