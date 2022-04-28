@@ -4,3 +4,4 @@ from .task import TaskTypes
 from .task import DeployTaskInterface
 from .task import FormatTask
 from .task import StaticAnalysisTask
+from .task import WorkflowTask

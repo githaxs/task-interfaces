@@ -3,6 +3,7 @@ from abc import ABC
 from abc import abstractmethod
 from enum import Enum
 from pydantic import BaseModel
+from typing import List
 
 class TaskTypes(Enum):
     CODE_FORMAT = "code_format"
@@ -51,18 +52,30 @@ class SubscriptionLevels:
     GROWTH = 2
     ENTERPRISE = 3
 
-class FormatTask(BaseModel):
+class BaseTask(BaseModel):
     name: str
     subscription_level: int
-    can_fix: bool = True
-    type = TaskTypes.CODE_FORMAT
-    source_script_path: str
-    handler: str = "task"
 
     @property
     def slug(self):
         """Retuns the slug of the task."""
         return self.name.lower().replace(' ', '-')
+
+
+class WorkflowTask(BaseTask):
+    actions: List[dict]
+    type: str = TaskTypes.WORKFLOW
+
+    @abstractmethod
+    def execute(self, github_body) -> bool:
+        """Logic to execute for task"""
+        raise NotImplementedError("Please implement execute method.")
+
+class FormatTask(BaseTask):
+    can_fix: bool = True
+    type = TaskTypes.CODE_FORMAT
+    source_script_path: str
+    handler: str = "task"
 
     def pre_execute_hook(self, settings):
         pass
