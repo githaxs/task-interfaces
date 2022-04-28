@@ -2,6 +2,7 @@ import re
 from abc import ABC
 from abc import abstractmethod
 from enum import Enum
+from pydantic import BaseModel
 
 class TaskTypes(Enum):
     CODE_FORMAT = "code_format"
@@ -50,15 +51,25 @@ class SubscriptionLevels:
     GROWTH = 2
     ENTERPRISE = 3
 
+class FormatTask(BaseModel):
+    name: str
+    subscription_level: int
+    can_fix: bool = True
+    type = TaskTypes.CODE_FORMAT
+    source_script_path: str
+    handler: str = "task"
+
+    @property
+    def slug(self):
+        """Retuns the slug of the task."""
+        return self.name.lower().replace(' ', '-')
+
+
 class TaskInterface(ABC):
     command: str = ""
     source_script_path: str = ""
     handler: str = ""
-    file_filters: str = ""
-    requires_dependencies = False
 
-    # If using custom script, validate the file exists
-    # IF meta analysis, I don't need any script stuff
     def __init__(self):
         if self.subscription_level not in [0, 1, 2, 3]:
             raise Exception("Subscription Level is not a valid value.")
@@ -90,30 +101,6 @@ class TaskInterface(ABC):
     def slug(self):
         """Retuns the slug of the task."""
         return self.name.lower().replace(' ', '-')
-
-    @property
-    @abstractmethod
-    def fail_summary(self) -> str:
-        """Summary to return if task fails."""
-        pass
-
-    @property
-    @abstractmethod
-    def fail_text(self) -> str:
-        """Longer description to return if task fails."""
-        pass
-
-    @property
-    @abstractmethod
-    def pass_summary(self) -> str:
-        """Summary to return if task passes."""
-        pass
-
-    @property
-    @abstractmethod
-    def pass_text(self) -> str:
-        """Longer description to return if task passes."""
-        pass
 
     @property
     @abstractmethod
