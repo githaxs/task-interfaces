@@ -67,6 +67,8 @@ class FormatTask(BaseModel):
     def pre_execute_hook(self, settings):
         pass
 
+class StaticAnalysisTask(FormatTask):
+    can_fix: bool = False
 
 class TaskInterface(ABC):
     command: str = ""
