@@ -3,7 +3,7 @@ from abc import ABC
 from abc import abstractmethod
 from enum import Enum
 from pydantic import BaseModel
-from typing import List
+from typing import List, Dict
 
 class TaskTypes(Enum):
     CODE_FORMAT = "code_format"
@@ -63,8 +63,9 @@ class BaseTask(BaseModel):
 
 
 class WorkflowTask(BaseTask):
-    actions: List[dict]
+    actions: List[Dict]
     type: str = TaskTypes.WORKFLOW
+    pass_summary: str = ""
 
     @abstractmethod
     def execute(self, github_body) -> bool:
