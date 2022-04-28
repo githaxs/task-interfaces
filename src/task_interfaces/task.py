@@ -64,6 +64,9 @@ class FormatTask(BaseModel):
         """Retuns the slug of the task."""
         return self.name.lower().replace(' ', '-')
 
+    def pre_execute_hook(self):
+        pass
+
 
 class TaskInterface(ABC):
     command: str = ""
