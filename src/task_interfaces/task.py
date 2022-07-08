@@ -89,10 +89,12 @@ class FormatTask(BaseTask):
 class StaticAnalysisTask(FormatTask):
     can_fix: bool = False
 
+
 class CodeAnalysisTask(BaseTask):
     type = TaskTypes.CODE_ANALYSIS
     source_script_path: str
     handler: str = "task"
+
 
 class TaskInterface(ABC):
     command: str = ""
