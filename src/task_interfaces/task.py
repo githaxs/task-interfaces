@@ -95,6 +95,9 @@ class CodeAnalysisTask(BaseTask):
     source_script_path: str
     handler: str = "task"
 
+    def pre_execute_hook(self, settings):
+        pass
+
 
 class TaskInterface(ABC):
     command: str = ""
