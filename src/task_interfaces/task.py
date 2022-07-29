@@ -108,6 +108,10 @@ class Task(BaseModel):
 
         return capability.allow_hotfix
 
+    def get_checkout_depth(self):
+        capability = self.__get_capability(CheckoutCapability)
+        return capability.depth
+
     def ignored_authors(self):
         if not self.__check_for_capability(CheckRunCapability):
             return []
