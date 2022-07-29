@@ -1,6 +1,6 @@
 from enum import Enum
 from pydantic import BaseModel, Field
-from typing import Annotate, List, Any, Optional, Union, Literal
+from typing import Annotated, List, Any, Optional, Union, Literal
 from os.path import exists
 
 class SubscriptionLevels:
