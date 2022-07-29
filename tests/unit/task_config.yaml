@@ -1,0 +1,10 @@
+name: Test Task
+slug: test-task
+summary: Test Task
+description: Test Task
+subscribed_events:
+  - pull_request.opened
+capabilities:
+  - type: checkout
+  - type: checkrun
+runtime: python

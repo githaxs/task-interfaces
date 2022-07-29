@@ -42,7 +42,6 @@ class CheckRunCapability(BaseModel):
 
 ## End of capabilities
 
-## Task Properties
 CapabilityItem = Annotated[
     Union[
         InjectSettingsCapability,
@@ -52,6 +51,16 @@ CapabilityItem = Annotated[
         CheckoutCapability,],
     Field(discriminator="type")
 ]
+
+## Packages
+
+class Packages(BaseModel):
+    python: List[str] = []
+    system: List[str] = []
+    node: List[str] = []
+
+## Task Properties
+
 class ParameterTypes(str, Enum):
     STRING = 'string'
     SECRET = 'secret'
@@ -87,6 +96,7 @@ class Task(BaseModel):
     storage: int = 512
     show: str = 'all' # all | admin | none
     default_configuration: DefaultConfiguration
+    packages: Optional[Packages]
 
     @property
     def slug(self):
@@ -101,6 +111,9 @@ class Task(BaseModel):
     def has_check_run_capability(self):
         return self.__check_for_capability(CheckRunCapability)
 
+    def has_main_branch_capability(self):
+        return self.__check_for_capability(MainBranchAnalysisCapability)
+        
     def allows_for_hotfixes(self):
         if not self.__check_for_capability(CheckRunCapability):
             return False
