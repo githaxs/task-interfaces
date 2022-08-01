@@ -106,6 +106,9 @@ class Task(BaseModel):
         return self.name.lower().replace(' ', '-')
 
     def __check_for_capability(self, capability):
+        if self.capabilities is None:
+            return False
+
         return any([isinstance(x, capability) for x in self.capabilities])
 
     def __get_capability(self, capability):
@@ -231,7 +234,7 @@ class Task(BaseModel):
             'subscription_level': self.subscription_level,
             'parameters': self.get_parameters(),
             'show': self.show,
-            'capabilities': [x.dict() for x in self.capabilities],
+            'capabilities': [x.dict() for x in self.capabilities] if self.capabilities is not None else None,
             'subscribed_events': self.get_subscribed_events(),
             'default_configuration': self.default_configuration.dict(),
         }
