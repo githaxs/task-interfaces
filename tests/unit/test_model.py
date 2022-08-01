@@ -47,6 +47,25 @@ def test_get_actions():
         ],
         subscription_level=2,
         runtime='python',
-
     )
+
     assert len(task.get_check_run_actions()) == 1
+
+def test_iam_role_paremeters():
+    task = Task(
+        name="Test",
+        slug="test",
+        summary="",
+        description="",
+        capabilities=[
+            {
+                'type': 'aws-assume-iam-role',
+            },
+        ],
+        subscription_level=2,
+        runtime='python',
+    )
+
+    parameters =  task.get_parameters()
+
+    assert parameters[0]['name'] == 'iam_role_arn'

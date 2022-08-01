@@ -21,7 +21,6 @@ class AssumeIAMRoleCapability(BaseModel):
 class MainBranchAnalysisCapability(BaseModel):
     type: Literal["main-branch-analysis"]
 
-
 class CheckoutCapability(BaseModel):
     """Adding this capability will clone the repository."""
     type: Literal["checkout"]
@@ -70,7 +69,8 @@ class Parameter(BaseModel):
     name: str
     description: str
     default: Optional[Any] = None
-    type: ParameterTypes
+    type: Optional[ParameterTypes]
+    required: Optional[bool] = False
 
 
 class Installation(BaseModel):
@@ -86,16 +86,16 @@ class Task(BaseModel):
     summary: str
     description: str
     beta: bool = True
-    capabilities: List[CapabilityItem]
+    capabilities: Optional[List[CapabilityItem]]
     subscription_level: int = 0
-    runtime: str
+    runtime: Optional[str]
     parameters: Optional[List[Parameter]] = []
     has_public_repo: Optional[bool] = True
     memory: int = 512
     timeout: int = 60
     storage: int = 512
     show: str = 'all' # all | admin | none
-    default_configuration: DefaultConfiguration
+    default_configuration: Optional[DefaultConfiguration]
     packages: Optional[Packages]
 
     @property
@@ -128,7 +128,7 @@ class Task(BaseModel):
     def ignored_authors(self):
         if not self.__check_for_capability(CheckRunCapability):
             return []
-        capability = self.__get_capability(CheckoutCapability)
+        capability = self.__get_capability(CheckRunCapability)
 
         return capability.ignored_authors
         
@@ -184,8 +184,17 @@ class Task(BaseModel):
             exit(1)
 
     def get_parameters(self):
-        if len(self.ignored_authors()) > 0:
-            self.parameters.append()
+        if self.__check_for_capability(AssumeIAMRoleCapability):
+            self.parameters.append(
+                Parameter(
+                    name='iam_role_arn',
+                    description='AWS IAM role ARN to assume',
+                    default=None,
+                    type='string',
+                    required=True
+                )
+            )
+        return [x.dict() for x in self.parameters]
 
     def get_subscribed_events(self):
         events = []
@@ -216,6 +225,7 @@ class Task(BaseModel):
             'subscription_level': self.subscription_level,
             'parameters': self.get_parameters(),
             'show': self.show,
+            'capabilities': [x.dict() for x in self.capabilities],
             'subscribed_events': self.get_subscribed_events(),
             'default_configuration': self.default_configuration.dict(),
         }
