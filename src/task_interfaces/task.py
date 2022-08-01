@@ -57,6 +57,7 @@ class Packages(BaseModel):
     python: List[str] = []
     system: List[str] = []
     node: List[str] = []
+    custom: List[str] = []
 
 ## Task Properties
 
@@ -94,10 +95,12 @@ class Task(BaseModel):
     memory: int = 512
     timeout: int = 60
     storage: int = 512
-    show: str = 'all' # all | admin | none
+    show: str = 'all' # all | owner | admin | none
     default_configuration: Optional[DefaultConfiguration]
     packages: Optional[Packages]
-
+    owner: Optional[str] = 'githaxs' #GitHub org that created the task
+    hosting_option: Optional[str] = 'saas' # saas | self_hosted -> For future use when we allow tasks to be hosted on client infrastructure
+    
     @property
     def slug(self):
         return self.name.lower().replace(' ', '-')
