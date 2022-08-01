@@ -193,6 +193,8 @@ class Task(BaseModel):
             exit(1)
 
     def get_parameters(self):
+        if self.parameters is None:
+            return None
         if self.__check_for_capability(AssumeIAMRoleCapability):
             self.parameters.append(
                 Parameter(
