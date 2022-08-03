@@ -12,7 +12,7 @@ class SubscriptionLevels:
 
 ## List of Capabilities that tasks are able to add
 class GithaxsWorker(BaseModel):
-    type: Literal["githax-worker"]
+    type: Literal["githaxs-worker"]
 
 class InjectSettingsCapability(BaseModel):
     type: Literal["inject-settings"]
