@@ -11,6 +11,8 @@ class SubscriptionLevels:
 
 
 ## List of Capabilities that tasks are able to add
+class GithaxsWorker(BaseModel):
+    type: Literal["githax-worker"]
 
 class InjectSettingsCapability(BaseModel):
     type: Literal["inject-settings"]
@@ -43,6 +45,7 @@ class CheckRunCapability(BaseModel):
 
 CapabilityItem = Annotated[
     Union[
+        GithaxsWorker,
         InjectSettingsCapability,
         AssumeIAMRoleCapability,
         MainBranchAnalysisCapability,
@@ -119,6 +122,9 @@ class Task(BaseModel):
 
     def has_main_branch_capability(self):
         return self.__check_for_capability(MainBranchAnalysisCapability)
+
+    def has_githaxs_worker_capability(self):
+        return self.__check_for_capability(GithaxsWorker)
         
     def has_aws_iam_assume_role_capability(self):
         return self.__check_for_capability(AssumeIAMRoleCapability)
@@ -221,6 +227,9 @@ class Task(BaseModel):
 
         if self.has_main_branch_capability():
             events += ['push']
+
+        if self.has_githaxs_worker_capability():
+            events += ['githaxs']
 
         return events
 
