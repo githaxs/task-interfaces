@@ -19,9 +19,13 @@ class InjectSettingsCapability(BaseModel):
 
 class AssumeIAMRoleCapability(BaseModel):
     type: Literal["aws-assume-iam-role"]
+    inject_ssm_parameters: Optional[bool] = False
 
 class MainBranchAnalysisCapability(BaseModel):
     type: Literal["main-branch-analysis"]
+
+class DockerBuildCapability(BaseModel):
+    type: Literal["docker-build"]
 
 class CheckoutCapability(BaseModel):
     """Adding this capability will clone the repository."""
@@ -46,6 +50,7 @@ class CheckRunCapability(BaseModel):
 CapabilityItem = Annotated[
     Union[
         GithaxsWorker,
+        DockerBuildCapability,
         InjectSettingsCapability,
         AssumeIAMRoleCapability,
         MainBranchAnalysisCapability,
@@ -128,6 +133,16 @@ class Task(BaseModel):
         
     def has_aws_iam_assume_role_capability(self):
         return self.__check_for_capability(AssumeIAMRoleCapability)
+
+    def has_inject_ssm_parameters_capability(self):
+        if not self.has_aws_iam_assume_role_capability():
+            return False
+        capability = self.__get_capability(AssumeIAMRoleCapability)
+
+        return capability.inject_ssm_parameters
+        
+    def has_docker_build_capability(self):
+        return self.__check_for_capability(DockerBuildCapability)
 
     def allows_for_hotfixes(self):
         if not self.__check_for_capability(CheckRunCapability):
