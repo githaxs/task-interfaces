@@ -140,7 +140,7 @@ class Task(BaseModel):
         capability = self.__get_capability(AssumeIAMRoleCapability)
 
         return capability.inject_ssm_parameters
-        
+
     def has_docker_build_capability(self):
         return self.__check_for_capability(DockerBuildCapability)
 
@@ -215,12 +215,23 @@ class Task(BaseModel):
 
     def get_parameters(self):
         if self.parameters is None:
-            return None
+            self.parameters = []
         if self.__check_for_capability(AssumeIAMRoleCapability):
             self.parameters.append(
                 Parameter(
                     name='iam_role_arn',
                     description='AWS IAM role ARN to assume',
+                    default=None,
+                    type='string',
+                    required=True
+                )
+            )
+        
+        if self.has_inject_ssm_parameters_capability():
+            self.parameters.append(
+                Parameter(
+                    name='ssm_prefix',
+                    description='Prefix path of SSM parameters to inject into environment (i.e. /prod/',
                     default=None,
                     type='string',
                     required=True
