@@ -171,7 +171,7 @@ class Task(BaseModel):
         if actions is None:
             return None
 
-        if capability.allow_hotfix is True:
+        if capability.fix_errors is True:
             actions.append(Action(
                 label='Fix',
                 identifier='fix',
