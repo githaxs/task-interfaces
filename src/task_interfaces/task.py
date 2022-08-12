@@ -109,6 +109,7 @@ class Task(BaseModel):
     packages: Optional[Packages]
     owner: Optional[str] = 'githaxs' #GitHub org that created the task
     hosting_option: Optional[str] = 'saas' # saas | self_hosted -> For future use when we allow tasks to be hosted on client infrastructure
+    subscribed_events: Optional[List[str]] = []
     
     @property
     def slug(self):
@@ -241,7 +242,7 @@ class Task(BaseModel):
         return [x.dict() for x in self.parameters]
 
     def get_subscribed_events(self):
-        events = []
+        events = self.subscribed_events
         if self.has_check_run_capability():
             events += [
                 'pull_request.opened',
@@ -272,6 +273,7 @@ class Task(BaseModel):
             'subscription_level': self.subscription_level,
             'parameters': self.get_parameters(),
             'show': self.show,
+            'tags': self.tags,
             'capabilities': [x.dict() for x in self.capabilities] if self.capabilities is not None else None,
             'subscribed_events': self.get_subscribed_events(),
             'default_configuration': self.default_configuration.dict(),
