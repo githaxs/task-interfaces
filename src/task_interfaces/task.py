@@ -105,6 +105,7 @@ class Task(BaseModel):
     storage: int = 512
     show: str = 'all' # all | owner | admin | none
     default_configuration: Optional[DefaultConfiguration]
+    tags: Optional[List[str]] = []
     packages: Optional[Packages]
     owner: Optional[str] = 'githaxs' #GitHub org that created the task
     hosting_option: Optional[str] = 'saas' # saas | self_hosted -> For future use when we allow tasks to be hosted on client infrastructure
