@@ -3,6 +3,7 @@ from pydantic import BaseModel, Field
 from typing import Annotated, List, Any, Optional, Union, Literal
 from os.path import exists
 
+
 class SubscriptionLevels:
     FREE = 0
     STARTUP = 1
@@ -10,42 +11,54 @@ class SubscriptionLevels:
     ENTERPRISE = 3
 
 
-## List of Capabilities that tasks are able to add
+# List of Capabilities that tasks are able to add
 class GithaxsWorker(BaseModel):
     type: Literal["githaxs-worker"]
 
+
 class InjectSettingsCapability(BaseModel):
     type: Literal["inject-settings"]
+
 
 class AssumeIAMRoleCapability(BaseModel):
     type: Literal["aws-assume-iam-role"]
     inject_ssm_parameters: Optional[bool] = False
 
+
 class MainBranchAnalysisCapability(BaseModel):
     type: Literal["main-branch-analysis"]
+
 
 class DockerBuildCapability(BaseModel):
     type: Literal["docker-build"]
 
+
 class CheckoutCapability(BaseModel):
     """Adding this capability will clone the repository."""
     type: Literal["checkout"]
-    depth: Optional[int] = 1 # How many commits to clone
+    depth: Optional[int] = 1  # How many commits to clone
+
 
 class Action(BaseModel):
     label: str
     identifier: str
     description: str
 
+
 class CheckRunCapability(BaseModel):
     """Adding this capability will enable a task to report results to Check Runs."""
     type: Literal["checkrun"]
-    actions: Optional[List[Action]] = [] # Actions the user can invoke from the GitHub UI
-    ignored_authors: Optional[List[str]] # Pull Request authors to avoid for checks (i.e. always return passing)
-    allow_hotfix: Optional[bool] = False # Return passing check if branch or topic has hotfix in the name
-    fix_errors: Optional[bool] = False # A task can fix some of the issues it finds
+    # Actions the user can invoke from the GitHub UI
+    actions: Optional[List[Action]] = []
+    # Pull Request authors to avoid for checks (i.e. always return passing)
+    ignored_authors: Optional[List[str]]
+    # Return passing check if branch or topic has hotfix in the name
+    allow_hotfix: Optional[bool] = False
+    # A task can fix some of the issues it finds
+    fix_errors: Optional[bool] = False
 
-## End of capabilities
+# End of capabilities
+
 
 CapabilityItem = Annotated[
     Union[
@@ -55,11 +68,12 @@ CapabilityItem = Annotated[
         AssumeIAMRoleCapability,
         MainBranchAnalysisCapability,
         CheckRunCapability,
-        CheckoutCapability,],
+        CheckoutCapability, ],
     Field(discriminator="type")
 ]
 
-## Packages
+# Packages
+
 
 class Packages(BaseModel):
     python: List[str] = []
@@ -67,12 +81,14 @@ class Packages(BaseModel):
     node: List[str] = []
     custom: List[str] = []
 
-## Task Properties
+# Task Properties
+
 
 class ParameterTypes(str, Enum):
     STRING = 'string'
     SECRET = 'secret'
     BOOLEAN = 'boolean'
+
 
 class Parameter(BaseModel):
     name: str
@@ -86,9 +102,11 @@ class Installation(BaseModel):
     org: Optional[bool] = False
     repo_languages: Optional[List[str]] = []
 
+
 class DefaultConfiguration(BaseModel):
     installation: Installation
     settings: Optional[Any]
+
 
 class Task(BaseModel):
     name: str
@@ -103,14 +121,16 @@ class Task(BaseModel):
     memory: int = 512
     timeout: int = 60
     storage: int = 512
-    show: str = 'all' # all | owner | admin | none
+    show: str = 'all'  # all | owner | admin | none
     default_configuration: Optional[DefaultConfiguration]
     tags: Optional[List[str]] = []
     packages: Optional[Packages]
-    owner: Optional[str] = 'githaxs' #GitHub org that created the task
-    hosting_option: Optional[str] = 'saas' # saas | self_hosted -> For future use when we allow tasks to be hosted on client infrastructure
+    owner: Optional[str] = 'githaxs'  # GitHub org that created the task
+    # saas | self_hosted -> For future use when we allow tasks to be hosted on
+    # client infrastructure
+    hosting_option: Optional[str] = 'saas'
     subscribed_events: Optional[List[str]] = []
-    
+
     @property
     def slug(self):
         return self.name.lower().replace(' ', '-')
@@ -122,8 +142,10 @@ class Task(BaseModel):
         return any([isinstance(x, capability) for x in self.capabilities])
 
     def __get_capability(self, capability):
-        return next((x for x in self.capabilities if isinstance(x, capability)), None) 
-    
+        return next(
+            (x for x in self.capabilities if isinstance(
+                x, capability)), None)
+
     def has_check_run_capability(self):
         return self.__check_for_capability(CheckRunCapability)
 
@@ -132,7 +154,7 @@ class Task(BaseModel):
 
     def has_githaxs_worker_capability(self):
         return self.__check_for_capability(GithaxsWorker)
-        
+
     def has_aws_iam_assume_role_capability(self):
         return self.__check_for_capability(AssumeIAMRoleCapability)
 
@@ -163,7 +185,7 @@ class Task(BaseModel):
         capability = self.__get_capability(CheckRunCapability)
 
         return capability.ignored_authors
-        
+
     def get_check_run_actions(self):
         if not self.has_check_run_capability():
             return None
@@ -204,13 +226,15 @@ class Task(BaseModel):
     def validate(self):
         if self.runtime == 'bash':
             if not exists("./task.sh"):
-                print("task.sh must exist for runtime=bash and it must have a run function.")
+                print(
+                    "task.sh must exist for runtime=bash and it must have a run function.")
                 exit(1)
         elif self.runtime == 'python':
             if not exists("./task.py"):
-                print("task.py must exist for runtime=python and it must have a run function.")
+                print(
+                    "task.py must exist for runtime=python and it must have a run function.")
                 exit(1)
-        
+
         if self.runtime == 'bash' and not self.has_checkout_capability():
             print("Bash script tasks can only be used with cloned repos. Please add checkout capability or use python runtime.")
             exit(1)
@@ -228,7 +252,7 @@ class Task(BaseModel):
                     required=True
                 )
             )
-        
+
         if self.has_inject_ssm_parameters_capability():
             self.parameters.append(
                 Parameter(
@@ -236,9 +260,7 @@ class Task(BaseModel):
                     description='Prefix path of SSM parameters to inject into environment (i.e. /prod/',
                     default=None,
                     type='string',
-                    required=True
-                )
-            )
+                    required=True))
         return [x.dict() for x in self.parameters]
 
     def get_subscribed_events(self):
@@ -249,7 +271,7 @@ class Task(BaseModel):
                 'pull_request.reopened',
                 'pull_request.synchronize',
                 'check_run.rerequested',
-                ]
+            ]
         if self.get_check_run_actions() is not None:
             events += ['check_run.requested_action']
 
@@ -274,7 +296,8 @@ class Task(BaseModel):
             'parameters': self.get_parameters(),
             'show': self.show,
             'tags': self.tags,
-            'capabilities': [x.dict() for x in self.capabilities] if self.capabilities is not None else None,
+            'capabilities': [
+                x.dict() for x in self.capabilities] if self.capabilities is not None else None,
             'subscribed_events': self.get_subscribed_events(),
             'default_configuration': self.default_configuration.dict(),
         }
