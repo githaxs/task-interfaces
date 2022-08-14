@@ -115,7 +115,7 @@ class Task(BaseModel):
     beta: bool = True
     capabilities: Optional[List[CapabilityItem]]
     subscription_level: int = 0
-    runtime: Optional[str]
+    runtime: str
     parameters: Optional[List[Parameter]] = []
     has_public_repo: Optional[bool] = True
     memory: int = 512
