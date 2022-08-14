@@ -79,6 +79,7 @@ class Packages(BaseModel):
     python: List[str] = []
     system: List[str] = []
     node: List[str] = []
+    ruby: List[str] = []
     custom: List[str] = []
 
 # Task Properties
