@@ -116,7 +116,7 @@ class Task(BaseModel):
     beta: bool = True
     capabilities: Optional[List[CapabilityItem]]
     subscription_level: int = 0
-    runtime: str
+    runtime: Optional[str] = 'bash'
     parameters: Optional[List[Parameter]] = []
     has_public_repo: Optional[bool] = True
     memory: int = 512
@@ -296,6 +296,7 @@ class Task(BaseModel):
             'subscription_level': self.subscription_level,
             'parameters': self.get_parameters(),
             'show': self.show,
+            'runtime': self.runtime,
             'tags': self.tags,
             'capabilities': [
                 x.dict() for x in self.capabilities] if self.capabilities is not None else None,
