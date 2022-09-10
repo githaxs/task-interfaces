@@ -19,6 +19,8 @@ class GithaxsWorker(BaseModel):
 class InjectSettingsCapability(BaseModel):
     type: Literal["inject-settings"]
 
+class TaskOrchestratorCapability(BaseModel):
+    type: Literal["task-orchestrator"]
 
 class AssumeIAMRoleCapability(BaseModel):
     type: Literal["aws-assume-iam-role"]
@@ -68,7 +70,8 @@ CapabilityItem = Annotated[
         AssumeIAMRoleCapability,
         MainBranchAnalysisCapability,
         CheckRunCapability,
-        CheckoutCapability, ],
+        CheckoutCapability,
+        TaskOrchestratorCapability],
     Field(discriminator="type")
 ]
 
@@ -125,6 +128,7 @@ class Task(BaseModel):
     show: str = 'all'  # all | owner | admin | none
     default_configuration: Optional[DefaultConfiguration]
     tags: Optional[List[str]] = []
+    platform: Optional[str] = 'arm64'
     packages: Optional[Packages]
     owner: Optional[str] = 'githaxs'  # GitHub org that created the task
     # saas | self_hosted -> For future use when we allow tasks to be hosted on
@@ -156,6 +160,9 @@ class Task(BaseModel):
     def has_githaxs_worker_capability(self):
         return self.__check_for_capability(GithaxsWorker)
 
+    def has_task_orchestrator_capability(self):
+        return self.__check_for_capability(TaskOrchestratorCapability)
+        
     def has_aws_iam_assume_role_capability(self):
         return self.__check_for_capability(AssumeIAMRoleCapability)
 
