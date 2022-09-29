@@ -83,6 +83,7 @@ class Packages(BaseModel):
     system: List[str] = []
     node: List[str] = []
     ruby: List[str] = []
+    asdf: List[dict] = []
     custom: List[str] = []
 
 # Task Properties
@@ -135,6 +136,7 @@ class Task(BaseModel):
     # client infrastructure
     hosting_option: Optional[str] = 'saas'
     subscribed_events: Optional[List[str]] = []
+    extra_sam_resources: Optional[dict] = None
 
     @property
     def slug(self):
