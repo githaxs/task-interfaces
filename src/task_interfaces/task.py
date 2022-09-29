@@ -136,7 +136,7 @@ class Task(BaseModel):
     # client infrastructure
     hosting_option: Optional[str] = 'saas'
     subscribed_events: Optional[List[str]] = []
-    extra_sam_resources: Optional[dict] = None
+    extra_sam_resources: Optional[dict] = {}
 
     @property
     def slug(self):
