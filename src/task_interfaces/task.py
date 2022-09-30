@@ -58,6 +58,8 @@ class CheckRunCapability(BaseModel):
     allow_hotfix: Optional[bool] = False
     # A task can fix some of the issues it finds
     fix_errors: Optional[bool] = False
+    # Allow task to handle its own check run by injecting a client into the task
+    custom: Optional[bool] = False
 
 # End of capabilities
 
@@ -136,7 +138,7 @@ class Task(BaseModel):
     # client infrastructure
     hosting_option: Optional[str] = 'saas'
     subscribed_events: Optional[List[str]] = []
-    extra_sam_resources: Optional[dict] = {}
+    extra_sam_resources: Optional[List[str]] = []
 
     @property
     def slug(self):
@@ -224,6 +226,12 @@ class Task(BaseModel):
 
         return [x.dict() for x in actions]
 
+    def has_custom_check_run_capability(self):
+        if not self.__check_for_capability(CheckRunCapability):
+            return False
+        capability = self.__get_capability(CheckRunCapability)
+        return capability.custom
+        
     def has_inject_settings_capability(self):
         return self.__check_for_capability(InjectSettingsCapability)
 
