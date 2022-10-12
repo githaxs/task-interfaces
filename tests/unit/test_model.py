@@ -66,3 +66,21 @@ def test_iam_role_paremeters():
     parameters = task.get_parameters()
 
     assert parameters[0]['name'] == 'iam_role_arn'
+
+def test_slug():
+    task = Task(
+        name="Test Foo Bar",
+        summary="",
+        description="",
+        capabilities=[
+            {
+                'type': 'aws-assume-iam-role',
+            },
+        ],
+        subscription_level=2,
+        runtime='python',
+    )
+
+    assert 'slug' in task.dict()
+    assert task.dict()['slug'] == 'test-foo-bar'
+

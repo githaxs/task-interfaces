@@ -1,7 +1,8 @@
 from enum import Enum
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from typing import Annotated, List, Any, Optional, Union, Literal
 from os.path import exists
+from enum import Enum
 
 
 class SubscriptionLevels:
@@ -117,6 +118,7 @@ class DefaultConfiguration(BaseModel):
 
 class Task(BaseModel):
     name: str
+    slug: str = None
     summary: str
     description: str
     beta: bool = True
@@ -140,9 +142,13 @@ class Task(BaseModel):
     subscribed_events: Optional[List[str]] = []
     extra_sam_resources: Optional[List[str]] = []
 
-    @property
-    def slug(self):
-        return self.name.lower().replace(' ', '-')
+    @validator("slug", always=True)
+    def create_slug(cls, v, values, **kwargs):
+        return values['name'].lower().replace(' ', '-')
+
+    #@property
+    #def slug(self):
+    #    return self.name.lower().replace(' ', '-')
 
     def __check_for_capability(self, capability):
         if self.capabilities is None:
@@ -297,7 +303,7 @@ class Task(BaseModel):
             events += ['push']
 
         if self.has_githaxs_worker_capability():
-            events += ['githaxs']
+            events += ['githaxs.invoke_task']
 
         return events
 
