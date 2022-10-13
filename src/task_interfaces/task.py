@@ -1,7 +1,8 @@
 from enum import Enum
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from typing import Annotated, List, Any, Optional, Union, Literal
 from os.path import exists
+from enum import Enum
 
 
 class SubscriptionLevels:
@@ -19,8 +20,10 @@ class GithaxsWorker(BaseModel):
 class InjectSettingsCapability(BaseModel):
     type: Literal["inject-settings"]
 
+
 class TaskOrchestratorCapability(BaseModel):
     type: Literal["task-orchestrator"]
+
 
 class AssumeIAMRoleCapability(BaseModel):
     type: Literal["aws-assume-iam-role"]
@@ -58,6 +61,8 @@ class CheckRunCapability(BaseModel):
     allow_hotfix: Optional[bool] = False
     # A task can fix some of the issues it finds
     fix_errors: Optional[bool] = False
+    # Allow task to handle its own check run by injecting a client into the task
+    custom: Optional[bool] = False
 
 # End of capabilities
 
@@ -83,6 +88,7 @@ class Packages(BaseModel):
     system: List[str] = []
     node: List[str] = []
     ruby: List[str] = []
+    asdf: List[dict] = []
     custom: List[str] = []
 
 # Task Properties
@@ -114,6 +120,7 @@ class DefaultConfiguration(BaseModel):
 
 class Task(BaseModel):
     name: str
+    slug: str = None
     summary: str
     description: str
     beta: bool = True
@@ -135,10 +142,11 @@ class Task(BaseModel):
     # client infrastructure
     hosting_option: Optional[str] = 'saas'
     subscribed_events: Optional[List[str]] = []
+    extra_sam_resources: Optional[List[str]] = []
 
-    @property
-    def slug(self):
-        return self.name.lower().replace(' ', '-')
+    @validator("slug", always=True)
+    def create_slug(cls, v, values, **kwargs):
+        return values['name'].lower().replace(' ', '-')
 
     def __check_for_capability(self, capability):
         if self.capabilities is None:
@@ -162,7 +170,7 @@ class Task(BaseModel):
 
     def has_task_orchestrator_capability(self):
         return self.__check_for_capability(TaskOrchestratorCapability)
-        
+
     def has_aws_iam_assume_role_capability(self):
         return self.__check_for_capability(AssumeIAMRoleCapability)
 
@@ -221,6 +229,12 @@ class Task(BaseModel):
             return None
 
         return [x.dict() for x in actions]
+
+    def has_custom_check_run_capability(self):
+        if not self.__check_for_capability(CheckRunCapability):
+            return False
+        capability = self.__get_capability(CheckRunCapability)
+        return capability.custom
 
     def has_inject_settings_capability(self):
         return self.__check_for_capability(InjectSettingsCapability)
@@ -287,7 +301,7 @@ class Task(BaseModel):
             events += ['push']
 
         if self.has_githaxs_worker_capability():
-            events += ['githaxs']
+            events += ['githaxs.invoke_task']
 
         return events
 
