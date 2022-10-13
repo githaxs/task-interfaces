@@ -67,6 +67,7 @@ def test_iam_role_paremeters():
 
     assert parameters[0]['name'] == 'iam_role_arn'
 
+
 def test_slug():
     task = Task(
         name="Test Foo Bar",
@@ -83,4 +84,3 @@ def test_slug():
 
     assert 'slug' in task.dict()
     assert task.dict()['slug'] == 'test-foo-bar'
-

@@ -20,8 +20,10 @@ class GithaxsWorker(BaseModel):
 class InjectSettingsCapability(BaseModel):
     type: Literal["inject-settings"]
 
+
 class TaskOrchestratorCapability(BaseModel):
     type: Literal["task-orchestrator"]
+
 
 class AssumeIAMRoleCapability(BaseModel):
     type: Literal["aws-assume-iam-role"]
@@ -168,7 +170,7 @@ class Task(BaseModel):
 
     def has_task_orchestrator_capability(self):
         return self.__check_for_capability(TaskOrchestratorCapability)
-        
+
     def has_aws_iam_assume_role_capability(self):
         return self.__check_for_capability(AssumeIAMRoleCapability)
 
@@ -233,7 +235,7 @@ class Task(BaseModel):
             return False
         capability = self.__get_capability(CheckRunCapability)
         return capability.custom
-        
+
     def has_inject_settings_capability(self):
         return self.__check_for_capability(InjectSettingsCapability)
 
