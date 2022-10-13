@@ -146,10 +146,6 @@ class Task(BaseModel):
     def create_slug(cls, v, values, **kwargs):
         return values['name'].lower().replace(' ', '-')
 
-    #@property
-    #def slug(self):
-    #    return self.name.lower().replace(' ', '-')
-
     def __check_for_capability(self, capability):
         if self.capabilities is None:
             return False
