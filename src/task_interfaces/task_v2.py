@@ -1,12 +1,7 @@
 from enum import Enum
 from pydantic import BaseModel, Field, validator
-from typing import Annotated, List, Any, Optional, Union, Literal
-from os.path import exists
+from typing import List, Any, Optional
 from enum import Enum
-
-MIN_MEMORY=512
-MIN_STORAGE=512
-DEFAULT_TIMEOUT=60
 
 class SubscriptionLevels:
     FREE = 0
@@ -59,7 +54,7 @@ class CheckRun(BaseModel):
     # Allow task to handle its own check run by injecting a client into the task
     custom: Optional[bool] = False
     # Actions the user can invoke from the GitHub UI
-    actions: Optional[List[Action]] = []
+    actions: List[Action] = []
 
     @validator("actions", always=True)
     def _validate_actions(cls, v, values, **kwargs):
@@ -82,6 +77,7 @@ class CheckRun(BaseModel):
             )
 
         assert len(v) <= 3
+        return v
 # End of capabilities
 
 # Task Properties
@@ -137,38 +133,35 @@ class RunnerId(str, Enum):
     PYTHON_3_10 = 'python_3_10'
     NODE_16 = 'node_16'
 
+# TODO: forbid extra fields
 class Task(BaseModel):
-    version: str = Field(default=2, const=True)
-    name: str
-    capabilities: Optional[Capabilities] = Field(Capabilities())
+    version: int = Field(default=2, const=True)
+    name: str = Field(...)
     slug: str = None
     summary: str
     description: str
     beta: bool = True
+    capabilities: Capabilities = Field(Capabilities())
     subscription_level: int = SubscriptionLevels.FREE
-    parameters: Optional[List[Parameter]] = []
     has_public_repo: Optional[bool] = True
     show: str = 'all'  # all | owner | admin | none
+    installation: Installation = Installation() # New in V2
+    settings: Optional[Any] # New in V2
     default_configuration: Optional[DefaultConfiguration]
     tags: Optional[List[str]] = []
-    platform: Optional[str] = Field('arm64', const=True)
     owner: Optional[str] = Field('githaxs', const=True)  # GitHub org that created the task
     hosting_option: Optional[str] = Field('saas', const=True)
     subscribed_events: Optional[List[str]] = []
-    extra_sam_resources: Optional[List[str]] = []
     commands: List[Command] = Field(..., description="List of commands for task to execute")
     runner_id: RunnerId
+    parameters: Optional[List[Parameter]] = []
 
     @validator("slug", always=True)
     def create_slug(cls, v, values, **kwargs):
         return values['name'].lower().replace(' ', '-')
 
-    def validate(self):
-        assert self.capabilities.check_run.enabled and self.capabilities.main_branch_analysis.enabled is False, "A task cannot work on check runs and main branch analysis at the same time"
-        return True
-
     # TODO: fix this up
-    @validator("parameters", always=True)
+    @validator("parameters")
     def _validate_parameters(cls, v, values, **kwargs):
         if values['capabilities'].assume_iam_role.enabled:
             v.parameters.append(

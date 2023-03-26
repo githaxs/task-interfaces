@@ -126,23 +126,23 @@ class Task(BaseModel):
     beta: bool = True
     capabilities: Optional[List[CapabilityItem]]
     subscription_level: int = 0
-    runtime: Optional[str] = 'bash'
+    runtime: Optional[str] = Field('bash', description="Deprecated in V2")
     parameters: Optional[List[Parameter]] = []
     has_public_repo: Optional[bool] = True
-    memory: int = 512
-    timeout: int = 60
-    storage: int = 512
+    memory: int = Field(512, description="Deprecated in V2")
+    timeout: int = Field(60, description="Deprecated in V2")
+    storage: int = Field(512, description="Deprecated in V2")
     show: str = 'all'  # all | owner | admin | none
     default_configuration: Optional[DefaultConfiguration]
     tags: Optional[List[str]] = []
-    platform: Optional[str] = 'arm64'
-    packages: Optional[Packages]
+    platform: Optional[str] = Field('arm64', description="Deprecated in V2")
+    packages: Optional[Packages] # Deprecated in V2
     owner: Optional[str] = 'githaxs'  # GitHub org that created the task
     # saas | self_hosted -> For future use when we allow tasks to be hosted on
     # client infrastructure
-    hosting_option: Optional[str] = 'saas'
+    hosting_option: Optional[str] = 'saas' # Deprecated in V2
     subscribed_events: Optional[List[str]] = []
-    extra_sam_resources: Optional[List[str]] = []
+    extra_sam_resources: Optional[List[str]] = [] # Deprecated in V2
 
     @validator("slug", always=True)
     def create_slug(cls, v, values, **kwargs):
