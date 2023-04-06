@@ -133,7 +133,7 @@ class Task(BaseModel):
     timeout: int = Field(60, description="Deprecated in V2")
     storage: int = Field(512, description="Deprecated in V2")
     show: str = 'all'  # all | owner | admin | none
-    default_configuration: Optional[DefaultConfiguration]
+    default_configuration: Optional[DefaultConfiguration] = DefaultConfiguration()
     tags: Optional[List[str]] = []
     platform: Optional[str] = Field('arm64', description="Deprecated in V2")
     packages: Optional[Packages] # Deprecated in V2

@@ -1,5 +1,5 @@
 from enum import Enum
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, validator, Extra
 from typing import List, Any, Optional
 from enum import Enum
 
@@ -119,7 +119,7 @@ class Command(BaseModel):
     exit_code: Optional[int]
     output: Optional[str] = None
 
-class Capabilities(BaseModel):
+class Capabilities(BaseModel, extra=Extra.forbid):
     githaxs_worker: GithaxsWorker = Field(GithaxsWorker())
     task_settings: TaskSettings = Field(TaskSettings())
     task_orchestrator: TaskOrchestrator = Field(TaskOrchestrator())
