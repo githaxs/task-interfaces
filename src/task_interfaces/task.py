@@ -114,8 +114,8 @@ class Installation(BaseModel):
 
 
 class DefaultConfiguration(BaseModel):
-    installation: Installation
-    settings: Optional[Any]
+    installation: Optional[Installation] = Installation()
+    settings: Optional[Any] = {}
 
 
 class Task(BaseModel):
